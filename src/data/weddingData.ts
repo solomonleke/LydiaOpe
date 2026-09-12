@@ -45,6 +45,19 @@ export const COUPLE_DATA = {
 
 export const EVENTS: EventDetails[] = [
   {
+    id: 'marathon',
+    title: 'Pre-Wedding 10km Marathon',
+    subtitle: 'Friday Morning Run & Health Walk',
+    time: '6:30 AM (0630 HRS)',
+    date: 'Friday, 9th October, 2026',
+    venue: 'Okpara Square',
+    address: 'Independence Layout',
+    city: 'Enugu Metropolis, Enugu State',
+    description: 'Kick off the celebration weekend with a refreshing 10km morning run & fun walk with the couple! All fitness levels welcome. Branded tees & energy drinks provided.',
+    mapUrl: 'https://maps.google.com/?q=Okpara+Square+Enugu',
+    icon: 'Trophy'
+  },
+  {
     id: 'ceremony',
     title: 'Holy Matrimony',
     subtitle: 'Church Blessing & Exchange of Vows',
@@ -176,12 +189,108 @@ export const GALLERY_IMAGES: PhotoItem[] = [
     title: 'Counting Down',
     category: 'candid',
     description: 'Radiant joy as October 10th approaches.'
+  },
+  {
+    id: 'p12',
+    url: '/images/DSC09760.JPG.jpeg',
+    title: 'The Proposal Moment',
+    category: 'proposal',
+    description: 'Captured during the unforgettable romantic proposal.'
+  },
+  {
+    id: 'p13',
+    url: '/images/DSC09803.JPG.jpeg',
+    title: 'She Said Yes!',
+    category: 'proposal',
+    description: 'The priceless reaction as Ezinne joyfully accepted Opeyemi’s proposal.'
+  },
+  {
+    id: 'p14',
+    url: '/images/DSC09804.JPG.jpeg',
+    title: 'Proposal Joy',
+    category: 'proposal',
+    description: 'Radiant happiness right after the magical proposal.'
+  },
+  {
+    id: 'p15',
+    url: '/images/DSC09816.JPG.jpeg',
+    title: 'A Promise of Forever',
+    category: 'proposal',
+    description: 'Intimate portrait celebrating their proposal and forever commitment.'
+  },
+  {
+    id: 'p16',
+    url: '/images/DSC09820.JPG.jpeg',
+    title: 'Ring of Love',
+    category: 'proposal',
+    description: 'Cherished memories from the proposal celebration.'
+  },
+  {
+    id: 'p17',
+    url: '/images/DSC09825.JPG.jpeg',
+    title: 'Proposal Romance',
+    category: 'proposal',
+    description: 'Special moments captured during the surprise proposal.'
+  },
+  {
+    id: 'p18',
+    url: '/images/DSC09827.JPG.jpeg',
+    title: 'Shared Laughter & Love',
+    category: 'proposal',
+    description: 'Sweet, unscripted moments right after the proposal.'
+  },
+  {
+    id: 'p19',
+    url: '/images/DSC09838.JPG.jpeg',
+    title: 'Whispered Vows',
+    category: 'proposal',
+    description: 'Quiet whispers of love shared during the proposal evening.'
+  },
+  {
+    id: 'p20',
+    url: '/images/DSC09855.JPG.jpeg',
+    title: 'Proposal Elegance',
+    category: 'proposal',
+    description: 'Ezinne glowing with joy during the proposal shoot.'
+  },
+  {
+    id: 'p21',
+    url: '/images/DSC09856.JPG.jpeg',
+    title: 'The Groom\'s Proposal Joy',
+    category: 'proposal',
+    description: 'Opeyemi beaming with joy after Ezinne said YES!'
+  },
+  {
+    id: 'p22',
+    url: '/images/DSC09860.JPG.jpeg',
+    title: 'Warm Proposal Embrace',
+    category: 'proposal',
+    description: 'Wrapped in love right after the proposal.'
+  },
+  {
+    id: 'p23',
+    url: '/images/DSC09868.JPG.jpeg',
+    title: 'Celebration of Love',
+    category: 'proposal',
+    description: 'Capturing the magic of their proposal story.'
+  },
+  {
+    id: 'p24',
+    url: '/images/DSC09870.JPG.jpeg',
+    title: 'Proposal Forever',
+    category: 'proposal',
+    description: 'Stepping into the future together after a beautiful proposal.'
   }
 ];
 
 export const INITIAL_MEMORIES: MemoryPost[] = [];
 
 export const FAQS: FaqItem[] = [
+  {
+    question: 'How can I participate in the Friday 10km Pre-Wedding Marathon?',
+    answer: 'The 10km Marathon & Fun Walk kicks off on Friday, 9th October, 2026 at 6:30 AM at Okpara Square, Enugu. All guests, friends, and family are warmly invited! Wear comfortable sports gear. Branded shirts, water, and light refreshments will be provided.',
+    category: 'general'
+  },
   {
     question: 'What is the dress code and color theme?',
     answer: 'The official colors of the day are Burgundy, Blush Pink, Champagne Gold, and White. We kindly request formal traditional or black-tie attire reflecting these royal tones.',

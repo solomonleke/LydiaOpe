@@ -8,6 +8,7 @@ export const GallerySection: React.FC = () => {
 
   const cats = [
     { id: 'all', label: 'All Photos' },
+    { id: 'proposal', label: 'The Proposal' },
     { id: 'traditional', label: 'Traditional' },
     { id: 'romantic', label: 'Romantic' },
     { id: 'candid', label: 'Candid' },

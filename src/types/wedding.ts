@@ -16,7 +16,7 @@ export interface PhotoItem {
   id: string;
   url: string;
   title: string;
-  category: 'traditional' | 'romantic' | 'candid' | 'all';
+  category: 'traditional' | 'romantic' | 'candid' | 'proposal' | 'all';
   description?: string;
 }
 
