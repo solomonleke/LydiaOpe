@@ -7,7 +7,7 @@ interface HeroProps { onOpenIv: () => void; }
 
 export const Hero: React.FC<HeroProps> = ({ onOpenIv }) => {
   const [slide, setSlide] = useState(0);
-  const photos = GALLERY_IMAGES.map((p) => p.url);
+  const photos = GALLERY_IMAGES.filter((p) => p.category !== 'proposal').map((p) => p.url);
 
   useEffect(() => {
     const id = setInterval(() => setSlide((p) => (p + 1) % photos.length), 5000);
