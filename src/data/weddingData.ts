@@ -179,24 +179,7 @@ export const GALLERY_IMAGES: PhotoItem[] = [
   }
 ];
 
-export const INITIAL_MEMORIES: MemoryPost[] = [
-  {
-    id: 'm1',
-    author: 'Chidimma Ezeh',
-    relationship: 'Maid of Honor & Sister',
-    message: 'To my dearest sister Ezinne and my new brother Opeyemi, seeing you two together warms my heart. You complete each other so effortlessly!',
-    date: 'Sept 10, 2026',
-    likes: 24
-  },
-  {
-    id: 'm2',
-    author: 'Babajide Adeleke',
-    relationship: 'Best Man & Brother',
-    message: 'Opeyemi, you found the most incredible partner in Ezinne. Wishing you both a lifetime of divine blessings, joy, and peace!',
-    date: 'Sept 11, 2026',
-    likes: 19
-  }
-];
+export const INITIAL_MEMORIES: MemoryPost[] = [];
 
 export const FAQS: FaqItem[] = [
   {

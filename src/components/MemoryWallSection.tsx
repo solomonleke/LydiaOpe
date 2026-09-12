@@ -105,6 +105,14 @@ export const MemoryWallSection: React.FC = () => {
                   <Loader2 className="animate-spin" size={24} style={{ margin: '0 auto 12px' }} />
                   <p className="small-text">Loading blessings from Guestbook...</p>
                 </div>
+              ) : memories.length === 0 ? (
+                <div className="card card-gold" style={{ padding: '36px 24px', textAlign: 'center' }}>
+                  <Sparkles size={32} style={{ margin: '0 auto 12px', color: 'var(--gold)' }} />
+                  <div className="heading-sm" style={{ marginBottom: 6 }}>No blessings posted yet</div>
+                  <p className="small-text" style={{ maxWidth: 320, margin: '0 auto' }}>
+                    Be the very first guest to leave a warm prayer, advice, or wish for Lydia & Ope!
+                  </p>
+                </div>
               ) : (
                 memories.map((p) => (
                   <div key={p.id} className="memory-post">
