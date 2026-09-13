@@ -219,6 +219,219 @@ textarea.form-input { resize: vertical; min-height: 90px; }
 .schedule-venue-addr { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; padding-left: 26px; }
 .schedule-actions { display: flex; gap: 10px; margin-top: 16px; }
 
+/* ═══ MARATHON ROUTE MAP ═══ */
+.marathon-route-section {
+  margin-top: 48px;
+  background: linear-gradient(135deg, var(--blush-light) 0%, var(--ivory) 50%, var(--cream) 100%);
+  border: 1.5px solid var(--border-gold);
+  border-radius: var(--radius-xl);
+  padding: 40px 36px;
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(197,160,78,0.08);
+  position: relative;
+  overflow: hidden;
+}
+.marathon-route-section::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(197,160,78,0.12), transparent 70%);
+  pointer-events: none;
+}
+.marathon-route-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.marathon-route-header .label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.marathon-route-header .heading-md {
+  color: var(--burgundy);
+  margin-bottom: 8px;
+}
+.marathon-distance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  background: var(--white);
+  border: 1.5px solid var(--border-gold);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--burgundy);
+  box-shadow: var(--shadow-sm);
+}
+.marathon-distance-badge svg {
+  color: var(--gold-dark);
+}
+
+/* Route Points Row */
+.route-points-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 28px 0 36px;
+  position: relative;
+}
+.route-point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  min-width: 120px;
+}
+.route-point-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  border: 2.5px solid var(--gold);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  z-index: 3;
+}
+.route-point-icon.point-hotel {
+  background: var(--white);
+}
+.route-point-icon.point-start {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+}
+.route-point-icon.point-finish {
+  background: linear-gradient(135deg, var(--burgundy), var(--burgundy-light));
+  border-color: var(--burgundy);
+  color: var(--gold-light);
+}
+.route-point-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 2px;
+}
+.route-point-name {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 140px;
+}
+
+/* Connector Line between points */
+.route-connector {
+  flex: 1;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--gold) 0px,
+    var(--gold) 8px,
+    transparent 8px,
+    transparent 14px
+  );
+  margin: 0 -6px;
+  position: relative;
+  top: -18px;
+  z-index: 1;
+  min-width: 40px;
+}
+.route-connector::after {
+  content: '→';
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* Map Container */
+.route-map-container {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid var(--border-gold);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  background: var(--cream);
+}
+.route-map-container iframe {
+  width: 100%;
+  height: 380px;
+  border: none;
+  display: block;
+}
+.route-map-overlay-label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  background: rgba(255,253,248,0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--burgundy);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 768px) {
+  .marathon-route-section {
+    padding: 28px 20px;
+    margin-top: 36px;
+  }
+  .route-points-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .route-connector {
+    width: 3px;
+    height: 36px;
+    min-width: unset;
+    background: repeating-linear-gradient(
+      180deg,
+      var(--gold) 0px,
+      var(--gold) 8px,
+      transparent 8px,
+      transparent 14px
+    );
+    margin: -6px 0;
+    top: 0;
+  }
+  .route-connector::after {
+    content: '↓';
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: -4px;
+    transform: translateX(-50%);
+  }
+  .route-map-container iframe {
+    height: 280px;
+  }
+}
+
 /* ═══ COLORS / DRESS CODE ═══ */
 .colors-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
 .color-swatch-card { text-align: center; }

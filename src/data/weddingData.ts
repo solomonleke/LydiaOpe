@@ -45,6 +45,28 @@ export const COUPLE_DATA = {
 
 export const EVENTS: EventDetails[] = [
   {
+    id: 'marathon',
+    title: 'Pre-Wedding 10km Marathon',
+    subtitle: 'Friday Morning Run & Health Walk',
+    time: '6:30 AM (0630 HRS)',
+    date: 'Friday, 9th October, 2026',
+    venue: 'Okpara Square',
+    address: 'Independence Layout',
+    city: 'Enugu Metropolis, Enugu State',
+    description: 'Kick off the celebration weekend with a refreshing 10km morning run & fun walk with the couple! All fitness levels welcome. Branded tees & energy drinks provided.',
+    mapUrl: 'https://www.google.com/maps/dir/?api=1&origin=Decastle+Hotel+and+Resort+Enugu+GRA&destination=Independence+Layout+Enugu&waypoints=Okpara+Square+Enugu',
+    icon: 'Trophy',
+    distanceFromHotel: '~4.5 km from Decastle Hotel GRA (approx. 8 min drive)',
+    routePoints: {
+      p1Label: 'Point 1 (Hotel Base)',
+      p1Name: 'Decastle Hotel GRA',
+      p2Label: 'Point 2 (Flag-Off Start)',
+      p2Name: 'Okpara Square Arena',
+      p3Label: 'Point 3 (10km Finish Line)',
+      p3Name: 'Independence Layout Circuit'
+    }
+  },
+  {
     id: 'meet_greet',
     title: 'Pre-Wedding Meet & Greet',
     subtitle: 'Friday Evening Cultural Welcome',
@@ -53,7 +75,7 @@ export const EVENTS: EventDetails[] = [
     venue: 'Decastle Hotel Lounge & Gardens',
     address: 'Umuona Street, Enugu GRA',
     city: 'Enugu State, Nigeria',
-    description: 'Kick off the celebration weekend with a warm cultural welcome! Join the couple for an evening of relaxation, music, authentic Enugu special delicacies (bushmeat, Nkwobi, Abacha), and fresh palm wine.',
+    description: 'Relax and network with the couple! Enjoy an evening of music, authentic Enugu special delicacies (bushmeat, Nkwobi, Abacha), and fresh palm wine.',
     mapUrl: 'https://maps.google.com/?q=Decastle+Hotel+and+Resort+Enugu+GRA',
     icon: 'Utensils'
   },
@@ -286,6 +308,11 @@ export const GALLERY_IMAGES: PhotoItem[] = [
 export const INITIAL_MEMORIES: MemoryPost[] = [];
 
 export const FAQS: FaqItem[] = [
+  {
+    question: 'How can I participate in the Friday 10km Pre-Wedding Marathon?',
+    answer: 'The 10km Marathon & Fun Walk kicks off on Friday, 9th October, 2026 at 6:30 AM at Okpara Square, Enugu. All guests, friends, and family are warmly invited! Wear comfortable sports gear. Branded shirts, water, and light refreshments will be provided.',
+    category: 'general'
+  },
   {
     question: 'What is the Friday Pre-Wedding Meet & Greet?',
     answer: 'The Meet & Greet kicks off on Friday, 9th October, 2026 starting at 5:00 PM till late at Decastle Hotel Lounge in Enugu GRA. Guests are invited to unwind, socialize with the couple, and enjoy authentic Enugu special delicacies including bush meat, Nkwobi, Abacha, and fresh palm wine!',

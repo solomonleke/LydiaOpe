@@ -1,5 +1,5 @@
 import React from 'react';
-import { Church, PartyPopper, Utensils, Clock, MapPin, ExternalLink, CalendarPlus, Sparkles } from 'lucide-react';
+import { Church, PartyPopper, Trophy, Utensils, Clock, MapPin, ExternalLink, CalendarPlus, Sparkles, Navigation, Map } from 'lucide-react';
 import { EVENTS } from '../data/weddingData';
 
 export const ScheduleSection: React.FC = () => {
@@ -7,8 +7,11 @@ export const ScheduleSection: React.FC = () => {
     let dtStart = '20261010T100000Z';
     let dtEnd = '20261010T170000Z';
 
-    if (evtId === 'meet_greet' || evtId === 'marathon') {
-      dtStart = '20261009T160000Z'; // 5:00 PM West Africa Time (UTC+1)
+    if (evtId === 'marathon') {
+      dtStart = '20261009T053000Z'; // Friday 6:30 AM
+      dtEnd = '20261009T090000Z';
+    } else if (evtId === 'meet_greet') {
+      dtStart = '20261009T160000Z'; // Friday 5:00 PM
       dtEnd = '20261009T220000Z';
     }
 
@@ -21,18 +24,28 @@ export const ScheduleSection: React.FC = () => {
   };
 
   const renderIcon = (iconName: string) => {
+    if (iconName === 'Trophy') return <Trophy size={24} />;
     if (iconName === 'Utensils') return <Utensils size={24} />;
     if (iconName === 'Church') return <Church size={24} />;
     return <PartyPopper size={24} />;
   };
+
+  const getVenueNote = (evtId: string) => {
+    if (evtId === 'marathon') return 'Gathering & warm-ups 15 mins prior';
+    if (evtId === 'meet_greet') return 'Starts 5:00 PM • Casual & Traditional attire';
+    return 'Doors open 30 minutes prior';
+  };
+
+  // Find marathon event data for the route section
+  const marathonEvent = EVENTS.find(e => e.id === 'marathon');
 
   return (
     <section id="schedule" className="section">
       <div className="container">
         <div className="section-header">
           <div className="label"><Sparkles size={14} /> Celebration Weekend <Sparkles size={14} /></div>
-          <h2 className="heading-lg">Events & Schedule</h2>
-          <p className="body-text">Join us Friday 9th & Saturday 10th October 2026 as we celebrate our union in Enugu Metropolis.</p>
+          <h2 className="heading-lg">Events &amp; Schedule</h2>
+          <p className="body-text">Join us Friday 9th &amp; Saturday 10th October 2026 for 4 memorable events celebrating our union in Enugu.</p>
           <div className="gold-line" />
         </div>
 
@@ -59,7 +72,7 @@ export const ScheduleSection: React.FC = () => {
                   <div className="schedule-venue-name"><MapPin size={16} /> {evt.venue}</div>
                   <div className="schedule-venue-addr">{evt.address}, {evt.city}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 26, marginTop: 6, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    <Clock size={14} /> {evt.id === 'meet_greet' ? 'Starts 5:00 PM • Casual & Traditional attire' : 'Doors open 30 minutes prior'}
+                    <Clock size={14} /> {getVenueNote(evt.id)}
                   </div>
                 </div>
 
@@ -75,6 +88,66 @@ export const ScheduleSection: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {/* ── Marathon Route Map Section ── */}
+        {marathonEvent && marathonEvent.routePoints && (
+          <div className="marathon-route-section">
+            <div className="marathon-route-header">
+              <div className="label"><Trophy size={14} /> 10km Marathon Route <Trophy size={14} /></div>
+              <div className="heading-md">Race Day Route Map</div>
+              <div className="marathon-distance-badge">
+                <Navigation size={16} />
+                {marathonEvent.distanceFromHotel || '~4.5 km from Decastle Hotel GRA (approx. 8 min drive)'}
+              </div>
+            </div>
+
+            {/* 3 Route Points with Connectors */}
+            <div className="route-points-row">
+              <div className="route-point">
+                <div className="route-point-icon point-hotel">🏨</div>
+                <div className="route-point-label">{marathonEvent.routePoints.p1Label}</div>
+                <div className="route-point-name">{marathonEvent.routePoints.p1Name}</div>
+              </div>
+              <div className="route-connector" />
+              <div className="route-point">
+                <div className="route-point-icon point-start">🚩</div>
+                <div className="route-point-label">{marathonEvent.routePoints.p2Label}</div>
+                <div className="route-point-name">{marathonEvent.routePoints.p2Name}</div>
+              </div>
+              <div className="route-connector" />
+              <div className="route-point">
+                <div className="route-point-icon point-finish">🏆</div>
+                <div className="route-point-label">{marathonEvent.routePoints.p3Label}</div>
+                <div className="route-point-name">{marathonEvent.routePoints.p3Name}</div>
+              </div>
+            </div>
+
+            {/* Embedded Google Map */}
+            <div className="route-map-container">
+              <div className="route-map-overlay-label">
+                <Map size={12} /> Live Route
+              </div>
+              <iframe
+                title="Marathon Route Map"
+                src="https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d15867.5!2d7.49!3d6.45!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e0!4m5!1s0x1044a45f5b0a1b1d%3A0xdecastle!2sDecastle+Hotel+and+Resort%2C+GRA%2C+Enugu!3m2!1d6.4441!2d7.5004!4m5!1s0x1044a3c5e0c77777%3A0xokpara!2sOkpara+Square%2C+Independence+Layout%2C+Enugu!3m2!1d6.4530!2d7.5100!5e0!3m2!1sen!2sng!4v1"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 20 }}>
+              <a
+                href={marathonEvent.mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline btn-sm"
+              >
+                <ExternalLink size={14} /> Open Full 3-Point Route in Google Maps
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

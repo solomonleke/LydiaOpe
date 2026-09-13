@@ -10,6 +10,15 @@ export interface EventDetails {
   description: string;
   mapUrl: string;
   icon: string;
+  distanceFromHotel?: string;
+  routePoints?: {
+    p1Label: string;
+    p1Name: string;
+    p2Label: string;
+    p2Name: string;
+    p3Label: string;
+    p3Name: string;
+  };
 }
 
 export interface PhotoItem {
