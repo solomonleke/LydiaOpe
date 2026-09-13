@@ -324,9 +324,19 @@ export const FAQS: FaqItem[] = [
     category: 'dress'
   },
   {
-    question: 'Can I download the official invitation card (IV)?',
-    answer: 'Yes! You can view and download the high-resolution invitation card directly from the Official Invitation section on this website.',
-    category: 'rsvp'
+    question: 'Does the access card admit plus-ones?',
+    answer: 'No. Each access card admits only the guest(s) specifically named or indicated on the card.',
+    category: 'general'
+  },
+  {
+    question: 'Are there recommended hotels nearby?',
+    answer: 'Yes. We have recommended a few nearby accommodation options, including Decastle, Fiesto, and Best Touch.',
+    category: 'venue'
+  },
+  {
+    question: 'Will there be a livestream for guests who cannot attend?',
+    answer: 'Yes! There will be a live stream for guests who are unable to attend in person, so you can still celebrate with us from wherever you are.',
+    category: 'general'
   },
   {
     question: 'Where are the event venues located?',
