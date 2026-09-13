@@ -1,5 +1,5 @@
 import React from 'react';
-import { Church, PartyPopper, Trophy, Clock, MapPin, ExternalLink, CalendarPlus, Sparkles } from 'lucide-react';
+import { Church, PartyPopper, Utensils, Clock, MapPin, ExternalLink, CalendarPlus, Sparkles } from 'lucide-react';
 import { EVENTS } from '../data/weddingData';
 
 export const ScheduleSection: React.FC = () => {
@@ -7,9 +7,9 @@ export const ScheduleSection: React.FC = () => {
     let dtStart = '20261010T100000Z';
     let dtEnd = '20261010T170000Z';
 
-    if (evtId === 'marathon') {
-      dtStart = '20261009T053000Z';
-      dtEnd = '20261009T090000Z';
+    if (evtId === 'meet_greet' || evtId === 'marathon') {
+      dtStart = '20261009T160000Z'; // 5:00 PM West Africa Time (UTC+1)
+      dtEnd = '20261009T220000Z';
     }
 
     const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${title} - #OPENLILY2026\nLOCATION:${venue}, ${addr}\nDTSTART:${dtStart}\nDTEND:${dtEnd}\nEND:VEVENT\nEND:VCALENDAR`;
@@ -21,7 +21,7 @@ export const ScheduleSection: React.FC = () => {
   };
 
   const renderIcon = (iconName: string) => {
-    if (iconName === 'Trophy') return <Trophy size={24} />;
+    if (iconName === 'Utensils') return <Utensils size={24} />;
     if (iconName === 'Church') return <Church size={24} />;
     return <PartyPopper size={24} />;
   };
@@ -59,7 +59,7 @@ export const ScheduleSection: React.FC = () => {
                   <div className="schedule-venue-name"><MapPin size={16} /> {evt.venue}</div>
                   <div className="schedule-venue-addr">{evt.address}, {evt.city}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 26, marginTop: 6, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    <Clock size={14} /> {evt.id === 'marathon' ? 'Gathering & warm-ups 15 mins prior' : 'Doors open 30 minutes prior'}
+                    <Clock size={14} /> {evt.id === 'meet_greet' ? 'Starts 5:00 PM • Casual & Traditional attire' : 'Doors open 30 minutes prior'}
                   </div>
                 </div>
 
