@@ -1,8 +1,36 @@
-import React from 'react';
-import { Church, PartyPopper, Trophy, Utensils, Clock, MapPin, ExternalLink, CalendarPlus, Sparkles, Navigation, Map } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Church, PartyPopper, Trophy, Utensils, Clock, MapPin, ExternalLink, CalendarPlus, Sparkles, Navigation, Map, Vote, CheckCircle2, Flame, Loader2 } from 'lucide-react';
 import { EVENTS } from '../data/weddingData';
+import { PollOptionId, PollResultData } from '../types/wedding';
+import { getUserPollVote, fetchPollResults, submitPollVote } from '../services/sheetService';
 
 export const ScheduleSection: React.FC = () => {
+  const [userVote, setUserVote] = useState<PollOptionId | null>(getUserPollVote());
+  const [selectedOption, setSelectedOption] = useState<PollOptionId | null>(null);
+  const [pollResults, setPollResults] = useState<PollResultData>({
+    participate: 0,
+    unavailable: 0,
+    total: 0,
+    participatePct: 0,
+    unavailablePct: 0,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchPollResults().then((res) => {
+      setPollResults(res);
+    });
+  }, []);
+
+  const handleVoteSubmit = async () => {
+    if (!selectedOption || isSubmitting) return;
+    setIsSubmitting(true);
+    const response = await submitPollVote(selectedOption);
+    setUserVote(selectedOption);
+    setPollResults(response.results);
+    setIsSubmitting(false);
+  };
+
   const downloadIcs = (evtId: string, title: string, venue: string, addr: string) => {
     let dtStart = '20261010T100000Z';
     let dtEnd = '20261010T170000Z';
@@ -38,6 +66,7 @@ export const ScheduleSection: React.FC = () => {
 
   // Find marathon event data for the route section
   const marathonEvent = EVENTS.find(e => e.id === 'marathon');
+  const hasVoted = Boolean(userVote);
 
   return (
     <section id="schedule" className="section">
@@ -89,7 +118,7 @@ export const ScheduleSection: React.FC = () => {
           ))}
         </div>
 
-        {/* ── Marathon Route Map Section ── */}
+        {/* ── Marathon Route Map & Poll Section ── */}
         {marathonEvent && marathonEvent.routePoints && (
           <div className="marathon-route-section">
             <div className="marathon-route-header">
@@ -136,7 +165,7 @@ export const ScheduleSection: React.FC = () => {
               />
             </div>
 
-            <div style={{ textAlign: 'center', marginTop: 20 }}>
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
               <a
                 href={marathonEvent.mapUrl}
                 target="_blank"
@@ -146,9 +175,122 @@ export const ScheduleSection: React.FC = () => {
                 <ExternalLink size={14} /> Open Full 3-Point Route in Google Maps
               </a>
             </div>
+
+            {/* ── 10km Marathon Participation Poll ── */}
+            <div className="marathon-poll-container" id="marathon-poll">
+              <div className="marathon-poll-header">
+                <div className="marathon-poll-badge">
+                  <Vote size={14} /> Event Poll
+                </div>
+                <h3 className="marathon-poll-title">Are you running with us on Friday morning?</h3>
+                <p className="marathon-poll-sub">
+                  Cast your vote below to help us plan water stations, warm-up energy kits, and finish-line refreshments!
+                </p>
+              </div>
+
+              {hasVoted ? (
+                <div className="marathon-poll-results">
+                  <div className="poll-voted-notice">
+                    <CheckCircle2 size={18} />
+                    <span>Your vote is recorded: <strong>{userVote === 'participate' ? 'I will participate 🏃‍♂️' : 'I will not be available 💛'}</strong></span>
+                  </div>
+
+                  <div className="poll-bars-list">
+                    {/* Option 1: Participate */}
+                    <div className={`poll-bar-item ${userVote === 'participate' ? 'user-selected' : ''}`}>
+                      <div className="poll-bar-meta">
+                        <span className="poll-option-title">
+                          🏃‍♂️ I will participate {userVote === 'participate' && <span className="your-vote-tag">Your Vote</span>}
+                        </span>
+                        <span className="poll-option-percent">{pollResults.participatePct}% ({pollResults.participate} votes)</span>
+                      </div>
+                      <div className="poll-progress-track">
+                        <div
+                          className="poll-progress-fill fill-participate"
+                          style={{ width: `${pollResults.participatePct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Option 2: Not available */}
+                    <div className={`poll-bar-item ${userVote === 'unavailable' ? 'user-selected' : ''}`}>
+                      <div className="poll-bar-meta">
+                        <span className="poll-option-title">
+                          💛 I will not be available {userVote === 'unavailable' && <span className="your-vote-tag">Your Vote</span>}
+                        </span>
+                        <span className="poll-option-percent">{pollResults.unavailablePct}% ({pollResults.unavailable} votes)</span>
+                      </div>
+                      <div className="poll-progress-track">
+                        <div
+                          className="poll-progress-fill fill-unavailable"
+                          style={{ width: `${pollResults.unavailablePct}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="poll-total-count">
+                    <Flame size={14} /> Total votes cast: <strong>{pollResults.total}</strong>
+                  </div>
+                </div>
+              ) : (
+                <div className="marathon-poll-options-wrapper">
+                  <div className="poll-options-grid">
+                    <button
+                      type="button"
+                      className={`poll-option-card ${selectedOption === 'participate' ? 'active' : ''}`}
+                      onClick={() => setSelectedOption('participate')}
+                    >
+                      <div className="poll-option-radio">
+                        <div className="poll-option-radio-inner" />
+                      </div>
+                      <div className="poll-option-text">
+                        <div className="poll-option-heading">🏃‍♂️ I will participate</div>
+                        <div className="poll-option-desc">Count me in! I'll be at Okpara Square ready to run.</div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`poll-option-card ${selectedOption === 'unavailable' ? 'active' : ''}`}
+                      onClick={() => setSelectedOption('unavailable')}
+                    >
+                      <div className="poll-option-radio">
+                        <div className="poll-option-radio-inner" />
+                      </div>
+                      <div className="poll-option-text">
+                        <div className="poll-option-heading">💛 I will not be available</div>
+                        <div className="poll-option-desc">I won't be able to run, but I'll be cheering for you!</div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="poll-action-bar">
+                    <button
+                      type="button"
+                      className="btn btn-primary poll-submit-btn"
+                      disabled={!selectedOption || isSubmitting}
+                      onClick={handleVoteSubmit}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={16} className="spin" /> Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <Vote size={16} /> Submit Vote
+                        </>
+                      )}
+                    </button>
+                    <span className="poll-limit-note">🔒 1 vote per guest</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
     </section>
   );
 };
+

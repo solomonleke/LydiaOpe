@@ -61,3 +61,14 @@ export interface RsvpFormData {
   dietaryNotes?: string;
   message?: string;
 }
+
+export type PollOptionId = 'participate' | 'unavailable';
+
+export interface PollResultData {
+  participate: number;
+  unavailable: number;
+  total: number;
+  participatePct: number;
+  unavailablePct: number;
+}
+
