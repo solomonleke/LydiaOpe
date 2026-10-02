@@ -68,14 +68,14 @@ export const EVENTS: EventDetails[] = [
   },
   {
     id: 'meet_greet',
-    title: 'Pre-Wedding Meet & Greet',
+    title: 'Pre-Wedding Get Together',
     subtitle: 'Friday Evening Cultural Welcome',
     time: '5:00 PM Till Late (1700 HRS)',
     date: 'Friday, 9th October, 2026',
-    venue: 'Will be communicated 2 days to event',
+    venue: 'Restaurant (Will be communicated 2 days to event)',
     address: 'Enugu State',
     city: 'Nigeria',
-    description: 'Relax and network with the couple! Enjoy an evening of music, authentic Enugu special delicacies (bushmeat, Nkwobi, Abacha), and fresh palm wine.',
+    description: 'Relax and network with the couple at a restaurant in Enugu! Enjoy an evening of music, authentic Enugu special delicacies (bushmeat, Nkwobi, Abacha), and fresh palm wine.',
     mapUrl: '',
     icon: 'Utensils'
   },
@@ -370,8 +370,8 @@ export const FAQS: FaqItem[] = [
     category: 'general'
   },
   {
-    question: 'What is the Friday Pre-Wedding Meet & Greet?',
-    answer: 'The Meet & Greet kicks off on Friday, 9th October, 2026 starting at 5:00 PM till late. The exact location will be communicated 2 days to the event. Guests are invited to unwind, socialize with the couple, and enjoy authentic Enugu special delicacies including bush meat, Nkwobi, Abacha, and fresh palm wine!',
+    question: 'What is the Friday Pre-Wedding Get Together?',
+    answer: 'The Get Together kicks off on Friday, 9th October, 2026 starting at 5:00 PM till late at a restaurant in Enugu. The exact restaurant location will be communicated 2 days to the event. Guests are invited to unwind, socialize with the couple, and enjoy authentic Enugu special delicacies including bush meat, Nkwobi, Abacha, and fresh palm wine!',
     category: 'general'
   },
   {
