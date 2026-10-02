@@ -99,16 +99,20 @@ export const ScheduleSection: React.FC = () => {
 
                 <div className="schedule-venue">
                   <div className="schedule-venue-name"><MapPin size={16} /> {evt.venue}</div>
-                  <div className="schedule-venue-addr">{evt.address}, {evt.city}</div>
+                  <div className="schedule-venue-addr">
+                    {evt.address ? (evt.city ? `${evt.address}, ${evt.city}` : evt.address) : evt.city}
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 26, marginTop: 6, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                     <Clock size={14} /> {getVenueNote(evt.id)}
                   </div>
                 </div>
 
                 <div className="schedule-actions">
-                  <a href={evt.mapUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm">
-                    <ExternalLink size={14} /> Google Maps
-                  </a>
+                  {evt.mapUrl && (
+                    <a href={evt.mapUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm">
+                      <ExternalLink size={14} /> Google Maps
+                    </a>
+                  )}
                   <button onClick={() => downloadIcs(evt.id, evt.title, evt.venue, evt.address)} className="btn btn-ghost btn-sm">
                     <CalendarPlus size={14} /> Add to iCal
                   </button>

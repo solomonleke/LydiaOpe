@@ -3,8 +3,8 @@ import { EventDetails, PhotoItem, ColorSwatch, FaqItem, MemoryPost } from '../ty
 export const COUPLE_DATA = {
   hashtag: '#OPENLILY2026',
   title: 'Holy Matrimony of Ezinne & Opeyemi',
-  // Background music track URL (Can be a local file like '/music.mp3' or an online MP3 link)
-  bgMusicUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3',
+  // Background music track URL (Can be a local file like '/music.mp3', YouTube link, or online MP3 link)
+  bgMusicUrl: 'https://music.youtube.com/watch?v=sQtnhwU2R9Y&si=5ZGjLkacce9ubGCD',
   bride: {
     name: 'Ezinne Lydia Ezeh',
     shortName: 'Ezinne (Lydia)',
@@ -72,11 +72,11 @@ export const EVENTS: EventDetails[] = [
     subtitle: 'Friday Evening Cultural Welcome',
     time: '5:00 PM Till Late (1700 HRS)',
     date: 'Friday, 9th October, 2026',
-    venue: 'Decastle Hotel Lounge & Gardens',
-    address: 'Umuona Street, Enugu GRA',
-    city: 'Enugu State, Nigeria',
+    venue: 'Will be communicated 2 days to event',
+    address: 'Enugu State',
+    city: 'Nigeria',
     description: 'Relax and network with the couple! Enjoy an evening of music, authentic Enugu special delicacies (bushmeat, Nkwobi, Abacha), and fresh palm wine.',
-    mapUrl: 'https://maps.google.com/?q=Decastle+Hotel+and+Resort+Enugu+GRA',
+    mapUrl: '',
     icon: 'Utensils'
   },
   {
@@ -302,6 +302,62 @@ export const GALLERY_IMAGES: PhotoItem[] = [
     title: 'Proposal Forever',
     category: 'proposal',
     description: 'Stepping into the future together after a beautiful proposal.'
+  },
+  {
+    id: 'p25',
+    url: '/images/IMG_3210.jpeg',
+    title: 'Radiant Smiles',
+    category: 'romantic',
+    description: 'Captured moments of pure laughter and warmth.',
+    showInSlider: false
+  },
+  {
+    id: 'p26',
+    url: '/images/IMG_3211.jpeg',
+    title: 'Warm Connection',
+    category: 'candid',
+    description: 'Intimate and natural pre-wedding shoot moments.',
+    showInSlider: false
+  },
+  {
+    id: 'p27',
+    url: '/images/IMG_3212.jpeg',
+    title: 'Grace & Poise',
+    category: 'romantic',
+    description: 'Ezinne & Opeyemi shining in timeless style.',
+    showInSlider: false
+  },
+  {
+    id: 'p28',
+    url: '/images/IMG_3213.jpeg',
+    title: 'Side by Side',
+    category: 'candid',
+    description: 'Walking together hand in hand towards forever.',
+    showInSlider: false
+  },
+  {
+    id: 'p29',
+    url: '/images/IMG_3215.jpeg',
+    title: 'Cherished Glow',
+    category: 'romantic',
+    description: 'Golden hour portraits captured with elegance.',
+    showInSlider: false
+  },
+  {
+    id: 'p30',
+    url: '/images/IMG_3216.jpeg',
+    title: 'Joyful Whispers',
+    category: 'candid',
+    description: 'Unscripted smiles and genuine happiness.',
+    showInSlider: false
+  },
+  {
+    id: 'p31',
+    url: '/images/IMG_3217.jpeg',
+    title: 'Forever & Always',
+    category: 'romantic',
+    description: 'Celebrating love, unity, and bright new beginnings.',
+    showInSlider: false
   }
 ];
 
@@ -315,7 +371,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     question: 'What is the Friday Pre-Wedding Meet & Greet?',
-    answer: 'The Meet & Greet kicks off on Friday, 9th October, 2026 starting at 5:00 PM till late at Decastle Hotel Lounge in Enugu GRA. Guests are invited to unwind, socialize with the couple, and enjoy authentic Enugu special delicacies including bush meat, Nkwobi, Abacha, and fresh palm wine!',
+    answer: 'The Meet & Greet kicks off on Friday, 9th October, 2026 starting at 5:00 PM till late. The exact location will be communicated 2 days to the event. Guests are invited to unwind, socialize with the couple, and enjoy authentic Enugu special delicacies including bush meat, Nkwobi, Abacha, and fresh palm wine!',
     category: 'general'
   },
   {

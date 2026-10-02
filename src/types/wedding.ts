@@ -27,6 +27,7 @@ export interface PhotoItem {
   title: string;
   category: 'traditional' | 'romantic' | 'candid' | 'proposal' | 'all';
   description?: string;
+  showInSlider?: boolean;
 }
 
 export interface MemoryPost {
