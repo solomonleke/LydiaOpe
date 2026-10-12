@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Calendar, MapPin, Heart, ChevronDown } from 'lucide-react';
+import { Download, Calendar, MapPin, Heart, ChevronDown, Sparkles } from 'lucide-react';
 import { COUPLE_DATA, GALLERY_IMAGES } from '../data/weddingData';
 import { Countdown } from './Countdown';
 
@@ -52,9 +52,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenIv }) => {
         <Countdown targetDate={COUPLE_DATA.weddingDateISO} />
 
         <div className="hero-actions">
-          <a href="#rsvp" className="btn btn-primary">RSVP Now</a>
+          <a href="#memories" className="btn btn-primary">
+            <Sparkles size={16} /> Wedding Memories &amp; Upload
+          </a>
           <button onClick={onOpenIv} className="btn btn-ghost">
-            <Download size={16} /> Download Official IV
+            <Download size={16} /> Official IV
           </button>
         </div>
 

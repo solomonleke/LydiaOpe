@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, ThumbsUp, Send, Image, Sparkles, ImagePlus, Loader2 } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Send, Sparkles, Loader2, Camera } from 'lucide-react';
 import { INITIAL_MEMORIES } from '../data/weddingData';
 import { MemoryPost } from '../types/wedding';
 import { submitBlessing, fetchBlessings } from '../services/sheetService';
+import { WeddingMemoryVault } from './WeddingMemoryVault';
 
 export const MemoryWallSection: React.FC = () => {
   const [memories, setMemories] = useState<MemoryPost[]>(INITIAL_MEMORIES);
   const [tab, setTab] = useState<'guestbook' | 'vault'>('guestbook');
+  const [vaultCount, setVaultCount] = useState<number>(0);
   const [author, setAuthor] = useState('');
   const [rel, setRel] = useState('');
   const [msg, setMsg] = useState('');
@@ -55,7 +57,7 @@ export const MemoryWallSection: React.FC = () => {
         <div className="section-header">
           <div className="label"><Sparkles size={14} /> Memories & Well Wishes <Sparkles size={14} /></div>
           <h2 className="heading-lg">Memory Wall & Guestbook</h2>
-          <p className="body-text">Leave your loving thoughts for the couple. Your messages are saved for Lydia & Ope!</p>
+          <p className="body-text">Leave your loving thoughts for the couple and explore guest photos & short videos from our wedding!</p>
           <div className="gold-line" />
         </div>
 
@@ -65,7 +67,7 @@ export const MemoryWallSection: React.FC = () => {
               <MessageSquare size={16} /> Digital Guestbook ({memories.length})
             </button>
             <button className={`memory-tab ${tab === 'vault' ? 'active' : ''}`} onClick={() => setTab('vault')}>
-              <Image size={16} /> Wedding Memories
+              <Camera size={16} /> Wedding Memories {vaultCount > 0 ? `(${vaultCount})` : ''}
             </button>
           </div>
         </div>
@@ -139,16 +141,7 @@ export const MemoryWallSection: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="card card-gold">
-            <div className="memory-vault">
-              <div className="memory-vault-icon"><ImagePlus size={28} /></div>
-              <div className="heading-md" style={{ marginBottom: 8 }}>Wedding Memory Vault</div>
-              <p className="body-text" style={{ maxWidth: 480, margin: '0 auto 20px' }}>
-                This gallery will store magical moments from the ceremony. Check back after October 10th, 2026!
-              </p>
-              <div className="badge badge-gold"><Sparkles size={12} /> Ready for post-wedding uploads</div>
-            </div>
-          </div>
+          <WeddingMemoryVault onCountChange={setVaultCount} />
         )}
       </div>
     </section>

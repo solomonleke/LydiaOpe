@@ -1,4 +1,4 @@
-import { EventDetails, PhotoItem, ColorSwatch, FaqItem, MemoryPost } from '../types/wedding';
+import { EventDetails, PhotoItem, ColorSwatch, FaqItem, MemoryPost, WeddingMediaItem } from '../types/wedding';
 
 export const COUPLE_DATA = {
   hashtag: '#OPENLILY2026',
@@ -362,6 +362,8 @@ export const GALLERY_IMAGES: PhotoItem[] = [
 ];
 
 export const INITIAL_MEMORIES: MemoryPost[] = [];
+
+export const INITIAL_WEDDING_MEMORIES: WeddingMediaItem[] = [];
 
 export const FAQS: FaqItem[] = [
   {

@@ -73,3 +73,28 @@ export interface PollResultData {
   unavailablePct: number;
 }
 
+export type WeddingMediaCategory = 
+  | 'all'
+  | 'ceremony'
+  | 'reception'
+  | 'traditional'
+  | 'friends'
+  | 'candid';
+
+export interface WeddingMediaItem {
+  id: string;
+  author: string;
+  relationship: string;
+  caption: string;
+  mediaType: 'image' | 'video';
+  url: string;
+  localUrl?: string;
+  driveId?: string;
+  thumbnailUrl?: string;
+  fileName?: string;
+  category: WeddingMediaCategory;
+  date: string;
+  timestamp: string;
+  likes: number;
+}
+

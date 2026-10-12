@@ -29,6 +29,17 @@ export const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
     { label: 'Seconds', value: t.seconds },
   ];
 
+  const isConcluded = +new Date(targetDate) <= +new Date();
+
+  if (isConcluded) {
+    return (
+      <div className="countdown-concluded-banner">
+        <div className="concluded-badge">💍 JUST MARRIED • MR &amp; MRS ADELEKE 💍</div>
+        <div className="concluded-subtitle">Thank you to everyone who celebrated our union with love, joy, and blessings!</div>
+      </div>
+    );
+  }
+
   return (
     <div className="countdown">
       {units.map((u) => (
