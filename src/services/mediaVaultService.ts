@@ -366,6 +366,74 @@ export async function uploadMediaVaultItem(params: {
   return finalItem;
 }
 
+export interface BulkUploadProgress {
+  currentIndex: number;
+  total: number;
+  currentFileName: string;
+  status: 'uploading' | 'success' | 'error';
+  item?: WeddingMediaItem;
+  error?: string;
+}
+
+/**
+ * Bulk upload multiple media files sequentially with live progress callbacks
+ */
+export async function bulkUploadMediaVaultItems(params: {
+  files: File[];
+  author: string;
+  relationship: string;
+  category: WeddingMediaCategory;
+  caption?: string;
+  onProgress?: (progress: BulkUploadProgress) => void;
+}): Promise<{
+  successful: WeddingMediaItem[];
+  failed: { fileName: string; error: string }[];
+}> {
+  const { files, author, relationship, category, caption, onProgress } = params;
+  const successful: WeddingMediaItem[] = [];
+  const failed: { fileName: string; error: string }[] = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    onProgress?.({
+      currentIndex: i + 1,
+      total: files.length,
+      currentFileName: file.name,
+      status: 'uploading',
+    });
+
+    try {
+      const item = await uploadMediaVaultItem({
+        file,
+        author,
+        relationship,
+        category,
+        caption: caption || '',
+      });
+      successful.push(item);
+      onProgress?.({
+        currentIndex: i + 1,
+        total: files.length,
+        currentFileName: file.name,
+        status: 'success',
+        item,
+      });
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Upload failed';
+      failed.push({ fileName: file.name, error: errorMsg });
+      onProgress?.({
+        currentIndex: i + 1,
+        total: files.length,
+        currentFileName: file.name,
+        status: 'error',
+        error: errorMsg,
+      });
+    }
+  }
+
+  return { successful, failed };
+}
+
 /**
  * Increment like count on a media item
  */

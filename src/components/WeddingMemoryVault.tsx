@@ -16,7 +16,10 @@ import {
   Download,
   ExternalLink,
   Film,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Plus,
+  Trash2,
+  Layers
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { WeddingMediaItem, WeddingMediaCategory } from '../types/wedding';
@@ -24,6 +27,7 @@ import { INITIAL_WEDDING_MEMORIES } from '../data/weddingData';
 import {
   fetchMediaVaultItems,
   uploadMediaVaultItem,
+  bulkUploadMediaVaultItems,
   likeMediaVaultItem,
   exportVaultToExcel,
   extractDriveId,
@@ -43,9 +47,33 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [forceEmbedPlayer, setForceEmbedPlayer] = useState(false);
 
-  // Form states
+  // Upload Mode: 'single' | 'bulk'
+  const [uploadMode, setUploadMode] = useState<'single' | 'bulk'>('single');
+
+  // Single file state
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Bulk queued files state
+  interface QueuedBulkFile {
+    id: string;
+    file: File;
+    previewUrl: string;
+    isVideo: boolean;
+    status: 'idle' | 'uploading' | 'done' | 'error';
+    error?: string;
+  }
+  const [bulkFiles, setBulkFiles] = useState<QueuedBulkFile[]>([]);
+  const [bulkProgress, setBulkProgress] = useState<{
+    current: number;
+    total: number;
+    currentName: string;
+    percent: number;
+  } | null>(null);
+  const [bulkSuccessMessage, setBulkSuccessMessage] = useState('');
+  const bulkFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Common metadata
   const [author, setAuthor] = useState('');
   const [relationship, setRelationship] = useState('');
   const [category, setCategory] = useState<WeddingMediaCategory>('reception');
@@ -75,12 +103,11 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
     if (onCountChange) onCountChange(items.length);
   }, [items.length, onCountChange]);
 
-  // File selection & preview
+  // Single file selection & preview
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
 
-    // Check size limit: 50MB
     if (selected.size > 50 * 1024 * 1024) {
       setUploadError('File is too large! Please choose an image or short video under 50MB.');
       return;
@@ -116,56 +143,190 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Submit Upload
+  // Bulk files selection & queue management
+  const handleBulkFilesSelect = (selectedFiles: FileList | File[]) => {
+    const list = Array.from(selectedFiles);
+    if (list.length === 0) return;
+
+    const valid: QueuedBulkFile[] = [];
+    let tooLarge = 0;
+
+    list.forEach((f) => {
+      if (f.size > 50 * 1024 * 1024) {
+        tooLarge++;
+        return;
+      }
+      valid.push({
+        id: `bf-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        file: f,
+        previewUrl: URL.createObjectURL(f),
+        isVideo: f.type.startsWith('video'),
+        status: 'idle',
+      });
+    });
+
+    if (tooLarge > 0) {
+      setUploadError(`${tooLarge} file(s) exceeded the 50MB limit and were skipped.`);
+    } else {
+      setUploadError('');
+    }
+
+    setBulkFiles((prev) => [...prev, ...valid].slice(0, 30));
+  };
+
+  const handleBulkDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleBulkFilesSelect(e.dataTransfer.files);
+    }
+  };
+
+  const removeBulkFile = (id: string) => {
+    setBulkFiles((prev) => {
+      const found = prev.find((item) => item.id === id);
+      if (found?.previewUrl) URL.revokeObjectURL(found.previewUrl);
+      return prev.filter((item) => item.id !== id);
+    });
+  };
+
+  const clearAllBulkFiles = () => {
+    bulkFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
+    setBulkFiles([]);
+    if (bulkFileInputRef.current) bulkFileInputRef.current.value = '';
+  };
+
+  const resetAllUploadForms = () => {
+    clearFile();
+    clearAllBulkFiles();
+    setAuthor('');
+    setRelationship('');
+    setCaption('');
+    setUploadError('');
+    setUploadSuccess(false);
+    setBulkSuccessMessage('');
+    setBulkProgress(null);
+    setIsUploadOpen(false);
+  };
+
+  // Submit Upload (Single or Bulk)
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) {
-      setUploadError('Please select a photo or short video to upload.');
-      return;
-    }
     if (!author.trim()) {
       setUploadError('Please enter your name.');
       return;
     }
 
-    setUploading(true);
-    setUploadError('');
+    if (uploadMode === 'single') {
+      if (!file) {
+        setUploadError('Please select a photo or short video to upload.');
+        return;
+      }
 
-    try {
-      const newItem = await uploadMediaVaultItem({
-        file,
-        author,
-        relationship,
-        category,
-        caption,
-      });
+      setUploading(true);
+      setUploadError('');
 
-      setItems((prev) => combineUniqueMediaItems([newItem, ...prev]));
-      setUploading(false);
-      setUploadSuccess(true);
-
-      // Trigger celebratory confetti
       try {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#D4AF37', '#6B0D25', '#F5E6D3', '#FCE7F3'],
+        const newItem = await uploadMediaVaultItem({
+          file,
+          author,
+          relationship,
+          category,
+          caption,
         });
-      } catch {}
 
-      // Reset form
-      setTimeout(() => {
-        clearFile();
-        setAuthor('');
-        setRelationship('');
-        setCaption('');
-        setUploadSuccess(false);
-        setIsUploadOpen(false);
-      }, 1800);
-    } catch (err: any) {
-      setUploading(false);
-      setUploadError(err.message || 'Upload failed. Please try again.');
+        setItems((prev) => combineUniqueMediaItems([newItem, ...prev]));
+        setUploading(false);
+        setUploadSuccess(true);
+        setBulkSuccessMessage('Your moment is now live on the site and saved in the wedding records.');
+
+        try {
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#D4AF37', '#6B0D25', '#F5E6D3', '#FCE7F3'],
+          });
+        } catch {}
+
+        setTimeout(() => {
+          resetAllUploadForms();
+        }, 1800);
+      } catch (err: any) {
+        setUploading(false);
+        setUploadError(err.message || 'Upload failed. Please try again.');
+      }
+    } else {
+      // Bulk upload mode
+      if (bulkFiles.length === 0) {
+        setUploadError('Please select at least one photo or short video to upload.');
+        return;
+      }
+
+      setUploading(true);
+      setUploadError('');
+
+      try {
+        const filesToUpload = bulkFiles.map((b) => b.file);
+        const result = await bulkUploadMediaVaultItems({
+          files: filesToUpload,
+          author,
+          relationship,
+          category,
+          caption,
+          onProgress: (p) => {
+            const pct = Math.round((p.currentIndex / p.total) * 100);
+            setBulkProgress({
+              current: p.currentIndex,
+              total: p.total,
+              currentName: p.currentFileName,
+              percent: pct,
+            });
+
+            setBulkFiles((prev) =>
+              prev.map((item, idx) => {
+                if (idx === p.currentIndex - 1) {
+                  return {
+                    ...item,
+                    status: p.status === 'success' ? 'done' : p.status === 'error' ? 'error' : 'uploading',
+                    error: p.error,
+                  };
+                }
+                return item;
+              })
+            );
+
+            if (p.item) {
+              setItems((prev) => combineUniqueMediaItems([p.item!, ...prev]));
+            }
+          },
+        });
+
+        setUploading(false);
+        if (result.successful.length > 0) {
+          setUploadSuccess(true);
+          setBulkSuccessMessage(
+            `Successfully uploaded ${result.successful.length} of ${filesToUpload.length} moments to Google Drive and the wedding vault!`
+          );
+
+          try {
+            confetti({
+              particleCount: 140,
+              spread: 80,
+              origin: { y: 0.6 },
+              colors: ['#D4AF37', '#6B0D25', '#F5E6D3', '#FCE7F3'],
+            });
+          } catch {}
+
+          setTimeout(() => {
+            resetAllUploadForms();
+          }, 2400);
+        } else {
+          setUploadError('None of the files could be uploaded. Please verify your connection and try again.');
+        }
+      } catch (err: any) {
+        setUploading(false);
+        setUploadError(err.message || 'Batch upload failed. Please try again.');
+      }
     }
   };
 
@@ -209,6 +370,13 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
     return () => window.removeEventListener('keydown', onKey);
   }, [lightboxIndex, filteredItems.length]);
 
+  const bulkPhotosCount = bulkFiles.filter((b) => !b.isVideo).length;
+  const bulkVideosCount = bulkFiles.filter((b) => b.isVideo).length;
+  const bulkTotalMB = (
+    bulkFiles.reduce((acc, cur) => acc + cur.file.size, 0) /
+    (1024 * 1024)
+  ).toFixed(1);
+
   return (
     <div className="wedding-vault-wrapper">
       {/* Vault Hero Banner */}
@@ -227,9 +395,22 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
           <div className="vault-cta-group">
             <button
               className="btn btn-primary vault-upload-btn"
-              onClick={() => setIsUploadOpen(true)}
+              onClick={() => {
+                setUploadMode('single');
+                setIsUploadOpen(true);
+              }}
             >
-              <UploadCloud size={18} /> Upload Photo or Short Video
+              <UploadCloud size={18} /> Upload Moment
+            </button>
+            <button
+              className="btn vault-bulk-btn"
+              onClick={() => {
+                setUploadMode('bulk');
+                setIsUploadOpen(true);
+              }}
+              title="Select & upload multiple photos or short videos at once"
+            >
+              <Sparkles size={16} /> ⚡ Bulk Upload (Batch)
             </button>
             <button
               className="btn btn-outline vault-excel-btn"
@@ -424,22 +605,44 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
 
             <div className="modal-header">
               <div className="modal-header-icon">
-                <UploadCloud size={24} />
+                {uploadMode === 'bulk' ? <Layers size={24} /> : <UploadCloud size={24} />}
               </div>
               <h3 className="heading-md">Add to Wedding Memory Vault</h3>
               <p className="small-text">
-                Upload photos or short videos to be saved to the public vault &amp; wedding records.
+                {uploadMode === 'bulk'
+                  ? 'Batch upload multiple photos & short videos directly to the couple archive.'
+                  : 'Upload photos or short videos to be saved to the public vault & wedding records.'}
               </p>
+
+              {/* Mode Toggle Switcher */}
+              <div className="vault-modal-tabs">
+                <button
+                  type="button"
+                  className={`vault-modal-tab-btn ${uploadMode === 'single' ? 'active' : ''}`}
+                  onClick={() => !uploading && setUploadMode('single')}
+                  disabled={uploading}
+                >
+                  <Camera size={14} /> Single Moment
+                </button>
+                <button
+                  type="button"
+                  className={`vault-modal-tab-btn ${uploadMode === 'bulk' ? 'active' : ''}`}
+                  onClick={() => !uploading && setUploadMode('bulk')}
+                  disabled={uploading}
+                >
+                  <Sparkles size={14} /> Bulk Upload (Batch)
+                </button>
+              </div>
             </div>
 
             {uploadSuccess ? (
               <div className="vault-success-state">
                 <CheckCircle2 size={54} color="#059669" />
                 <h4 className="heading-sm" style={{ marginTop: 16 }}>
-                  Memory Uploaded Successfully!
+                  Moments Uploaded Successfully!
                 </h4>
-                <p className="small-text" style={{ marginTop: 8 }}>
-                  Your moment is now live on the site and saved in the wedding records.
+                <p className="small-text" style={{ marginTop: 8, maxWidth: 380, margin: '8px auto 0' }}>
+                  {bulkSuccessMessage || 'Your moments are now live on the site and saved in the wedding records.'}
                 </p>
               </div>
             ) : (
@@ -447,62 +650,210 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
                 <div className="vault-modal-body-scroll">
                   {uploadError && <div className="vault-error-banner">{uploadError}</div>}
 
-                  {/* Dropzone */}
-                  <div
-                    className={`vault-dropzone ${file ? 'has-file' : ''}`}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={handleDrop}
-                    onClick={() => !file && fileInputRef.current?.click()}
-                  >
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*,video/mp4,video/webm,video/quicktime"
-                      style={{ display: 'none' }}
-                      onChange={handleFileChange}
-                    />
+                  {/* SINGLE FILE MODE */}
+                  {uploadMode === 'single' && (
+                    <div
+                      className={`vault-dropzone ${file ? 'has-file' : ''}`}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={handleDrop}
+                      onClick={() => !file && fileInputRef.current?.click()}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,video/mp4,video/webm,video/quicktime"
+                        style={{ display: 'none' }}
+                        onChange={handleFileChange}
+                      />
 
-                    {previewUrl ? (
-                      <div className="vault-preview-container">
-                        {file?.type.startsWith('video') ? (
-                          <video
-                            src={previewUrl}
-                            controls
-                            className="vault-preview-media"
-                          />
-                        ) : (
-                          <img
-                            src={previewUrl}
-                            alt="Preview"
-                            className="vault-preview-media"
-                          />
-                        )}
-                        <button
-                          type="button"
-                          className="vault-remove-file-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            clearFile();
-                          }}
+                      {previewUrl ? (
+                        <div className="vault-preview-container">
+                          {file?.type.startsWith('video') ? (
+                            <video
+                              src={previewUrl}
+                              controls
+                              className="vault-preview-media"
+                            />
+                          ) : (
+                            <img
+                              src={previewUrl}
+                              alt="Preview"
+                              className="vault-preview-media"
+                            />
+                          )}
+                          <button
+                            type="button"
+                            className="vault-remove-file-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              clearFile();
+                            }}
+                          >
+                            <X size={16} /> Remove &amp; Choose Another
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="vault-dropzone-prompt">
+                          <div className="vault-dropzone-icon">
+                            <Camera size={24} />
+                            <Video size={24} />
+                          </div>
+                          <div className="vault-dropzone-title">
+                            Click to select photo or short video
+                          </div>
+                          <p className="vault-dropzone-hint">
+                            JPG, PNG, WEBP, MP4, MOV (Max 50MB)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* BULK UPLOAD MODE */}
+                  {uploadMode === 'bulk' && (
+                    <div>
+                      <input
+                        ref={bulkFileInputRef}
+                        type="file"
+                        multiple
+                        accept="image/*,video/mp4,video/webm,video/quicktime"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          if (e.target.files) handleBulkFilesSelect(e.target.files);
+                        }}
+                      />
+
+                      {bulkFiles.length === 0 ? (
+                        <div
+                          className="vault-dropzone"
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={handleBulkDrop}
+                          onClick={() => bulkFileInputRef.current?.click()}
                         >
-                          <X size={16} /> Remove &amp; Choose Another
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="vault-dropzone-prompt">
-                        <div className="vault-dropzone-icon">
-                          <Camera size={24} />
-                          <Video size={24} />
+                          <div className="vault-dropzone-icon">
+                            <Layers size={24} />
+                            <Sparkles size={24} />
+                          </div>
+                          <div className="vault-dropzone-title">
+                            Click or drag multiple photos &amp; short videos
+                          </div>
+                          <p className="vault-dropzone-hint">
+                            Select up to 30 files at once • JPG, PNG, WEBP, MP4, MOV (Max 50MB each)
+                          </p>
                         </div>
-                        <div className="vault-dropzone-title">
-                          Click to select photo or short video
+                      ) : (
+                        <div>
+                          <div className="vault-bulk-queue-header">
+                            <div className="vault-bulk-summary-tag">
+                              <Sparkles size={14} /> {bulkFiles.length} moments queued ({bulkPhotosCount} photos, {bulkVideosCount} videos • {bulkTotalMB} MB)
+                            </div>
+                            <button
+                              type="button"
+                              className="vault-bulk-clear-btn"
+                              onClick={clearAllBulkFiles}
+                              disabled={uploading}
+                            >
+                              Clear All
+                            </button>
+                          </div>
+
+                          <div className="vault-bulk-files-grid">
+                            {bulkFiles.map((bf) => (
+                              <div key={bf.id} className="vault-bulk-thumb-card">
+                                {bf.isVideo ? (
+                                  <video
+                                    src={bf.previewUrl}
+                                    className="vault-bulk-thumb-img"
+                                    muted
+                                    playsInline
+                                  />
+                                ) : (
+                                  <img
+                                    src={bf.previewUrl}
+                                    alt={bf.file.name}
+                                    className="vault-bulk-thumb-img"
+                                  />
+                                )}
+                                {!uploading && (
+                                  <button
+                                    type="button"
+                                    className="vault-bulk-thumb-remove"
+                                    onClick={() => removeBulkFile(bf.id)}
+                                    title="Remove this moment"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                )}
+                                <div className="vault-bulk-thumb-badge">
+                                  {bf.isVideo ? 'Video' : 'Photo'}
+                                </div>
+                                <div className={`vault-bulk-thumb-status ${bf.status}`}>
+                                  {bf.status === 'idle'
+                                    ? 'Ready'
+                                    : bf.status === 'uploading'
+                                    ? 'Uploading...'
+                                    : bf.status === 'done'
+                                    ? '✓ Uploaded'
+                                    : '✗ Failed'}
+                                </div>
+                              </div>
+                            ))}
+
+                            {!uploading && bulkFiles.length < 30 && (
+                              <button
+                                type="button"
+                                className="vault-bulk-add-more-btn"
+                                onClick={() => bulkFileInputRef.current?.click()}
+                                title="Add more moments to queue"
+                              >
+                                <Plus size={20} />
+                                <span>Add More</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <p className="vault-dropzone-hint">
-                          JPG, PNG, WEBP, MP4, MOV (Max 50MB)
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                      )}
+
+                      {/* Live Progress Bar when Uploading */}
+                      {uploading && bulkProgress && (
+                        <div className="vault-bulk-progress-box">
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              fontSize: '0.8rem',
+                              fontWeight: 600,
+                              color: 'var(--burgundy)',
+                            }}
+                          >
+                            <span>
+                              Uploading moment {bulkProgress.current} of {bulkProgress.total}...
+                            </span>
+                            <span>{bulkProgress.percent}%</span>
+                          </div>
+                          <div className="vault-progress-bar-bg">
+                            <div
+                              className="vault-progress-bar-fill"
+                              style={{ width: `${bulkProgress.percent}%` }}
+                            />
+                          </div>
+                          <div
+                            className="small-text"
+                            style={{
+                              fontSize: '0.72rem',
+                              marginTop: 4,
+                              color: 'var(--text-muted)',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            Current: {bulkProgress.currentName}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Form fields */}
                   <div className="form-group" style={{ marginTop: 16 }}>
@@ -512,7 +863,7 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
                       required
                       value={author}
                       onChange={(e) => setAuthor(e.target.value)}
-                      placeholder="e.g. Ebuka Okafor / The Adeleke Cousins"
+                      placeholder="e.g. Ebuka Okafor / The Adeleke Family"
                       disabled={uploading}
                     />
                   </div>
@@ -547,7 +898,9 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Caption or Loving Note</label>
+                    <label className="form-label">
+                      {uploadMode === 'bulk' ? 'Album Caption or Loving Note (Applied to batch)' : 'Caption or Loving Note'}
+                    </label>
                     <textarea
                       className="form-input"
                       rows={3}
@@ -563,7 +916,7 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
                   <button
                     type="button"
                     className="btn btn-ghost"
-                    onClick={() => setIsUploadOpen(false)}
+                    onClick={() => resetAllUploadForms()}
                     disabled={uploading}
                   >
                     Cancel
@@ -571,15 +924,21 @@ export const WeddingMemoryVault: React.FC<WeddingMemoryVaultProps> = ({ onCountC
                   <button
                     type="submit"
                     className="btn btn-primary"
-                    disabled={uploading || !file}
+                    disabled={uploading || (uploadMode === 'single' ? !file : bulkFiles.length === 0)}
                   >
                     {uploading ? (
                       <>
-                        <Loader2 className="animate-spin" size={16} /> Saving to Memory Vault...
+                        <Loader2 className="animate-spin" size={16} />{' '}
+                        {uploadMode === 'bulk'
+                          ? `Saving ${bulkProgress?.current || 1} of ${bulkFiles.length}...`
+                          : 'Saving to Memory Vault...'}
                       </>
                     ) : (
                       <>
-                        <Sparkles size={16} /> Post To Vault
+                        <Sparkles size={16} />{' '}
+                        {uploadMode === 'bulk'
+                          ? `Post All (${bulkFiles.length}) Moments To Vault`
+                          : 'Post To Vault'}
                       </>
                     )}
                   </button>

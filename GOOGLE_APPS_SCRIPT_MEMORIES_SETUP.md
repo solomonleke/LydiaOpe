@@ -33,6 +33,24 @@ This script is **data-safe**:
 
 ---
 
+## ⚡ Bulk Upload: 2 Easy Ways to Add Multiple Photos & Videos
+
+### Option A: From the Wedding Website (For Guests, Friends & Family)
+1. On the website, visit the **Memory Wall** section and click the **Wedding Memories** tab.
+2. Click the new **⚡ Bulk Upload (Batch)** button (or toggle to the **Bulk Upload** tab in the modal).
+3. Select or drag & drop up to **30 photos and short videos** at once.
+4. Enter your name and optional caption, then click **Post All Moments To Vault**.
+5. The website uploads each moment in sequence with a live percentage progress tracker, saving them to Google Drive and your Google Sheet automatically!
+
+### Option B: Direct Google Drive Folder Bulk Sync (For Official Photographers & Admins)
+1. In Google Drive, open the folder: **`Lydia & Ope Wedding Vault Uploads`**.
+2. Drag and drop 50, 100, or 200 photos/videos directly into the Drive folder.
+3. Open your Google Sheet, and in the top toolbar click:  
+   **`💍 Wedding Admin`** > **`🔄 Bulk Sync Google Drive Folder to Memories`**.
+4. The script scans the folder, ensures public permissions, generates direct CDN viewing URLs, and appends them to your **`Memories`** sheet with zero duplicates!
+
+---
+
 ## 📜 Complete Data-Safe Script (`Code.gs`)
 
 ```javascript
@@ -117,7 +135,88 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('💍 Wedding Admin')
     .addItem('Initialize / Fix Sheets & Columns', 'setupWeddingSheets')
+    .addItem('🔄 Bulk Sync Google Drive Folder to Memories', 'syncDriveFolderToMemoriesSheet')
     .addToUi();
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────
+ * BULK SYNC: Scans Google Drive "Lydia & Ope Wedding Vault Uploads" folder
+ * and registers any newly dropped images/videos directly into the sheet!
+ * Perfect for photographers uploading 50-100 photos at once directly into Drive.
+ * ─────────────────────────────────────────────────────────────────────────
+ */
+function syncDriveFolderToMemoriesSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var memHeaders = [
+    'Timestamp',
+    'Guest Name',
+    'Relationship',
+    'Category',
+    'Media Type',
+    'File Name',
+    'Direct Media URL',
+    'Drive File ID',
+    'Caption / Note',
+    'Likes'
+  ];
+  var sheet = getOrCreateSheet(ss, 'Memories', memHeaders);
+  var folder = getOrCreateFolder(DRIVE_FOLDER_NAME);
+
+  // Read existing file IDs from column 8 to prevent duplicates
+  var rows = sheet.getDataRange().getValues();
+  var existingIds = {};
+  for (var i = 1; i < rows.length; i++) {
+    var fid = rows[i][7] ? rows[i][7].toString().trim() : '';
+    if (fid) existingIds[fid] = true;
+  }
+
+  var files = folder.getFiles();
+  var addedCount = 0;
+
+  while (files.hasNext()) {
+    var file = files.next();
+    var fileId = file.getId();
+
+    if (existingIds[fileId]) continue; // already indexed
+
+    // Make public so visitors can view
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    var mime = file.getMimeType();
+    var isVideo = mime.indexOf('video') !== -1;
+    var mediaType = isVideo ? 'video' : 'image';
+    var fileName = file.getName();
+    var mediaUrl = isVideo
+      ? 'https://drive.google.com/uc?export=download&id=' + fileId
+      : 'https://lh3.googleusercontent.com/d/' + fileId;
+
+    var submittedAt = file.getDateCreated().toISOString();
+
+    sheet.appendRow([
+      submittedAt,
+      'Wedding Official / Photographer',
+      'Media Team',
+      'reception',
+      mediaType.toUpperCase(),
+      fileName,
+      mediaUrl,
+      fileId,
+      'Official Wedding Highlight',
+      1
+    ]);
+
+    existingIds[fileId] = true;
+    addedCount++;
+  }
+
+  var msg = addedCount > 0 
+    ? '✅ Successfully synced ' + addedCount + ' new moments from Google Drive into the Memories vault!'
+    : 'ℹ️ All files in Google Drive folder are already synced to the Memories sheet.';
+  try {
+    ss.toast(msg, 'Google Drive Bulk Sync', 6);
+  } catch (e) {}
+  Logger.log(msg);
 }
 
 /**

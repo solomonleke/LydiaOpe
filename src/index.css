@@ -1558,6 +1558,233 @@ textarea.form-input { resize: vertical; min-height: 90px; }
   flex-shrink: 0;
 }
 
+/* Bulk Upload Enhancements */
+.vault-bulk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 0.85rem;
+  background: linear-gradient(135deg, #FFFDF5 0%, #FEF3C7 100%);
+  border: 1.5px solid var(--gold);
+  color: var(--burgundy-dark);
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.vault-bulk-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+  color: var(--burgundy);
+}
+
+.vault-modal-tabs {
+  display: flex;
+  background: var(--cream);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  margin: 12px auto 16px;
+  max-width: 380px;
+  width: 100%;
+}
+
+.vault-modal-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.vault-modal-tab-btn.active {
+  background: var(--burgundy);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(107, 13, 37, 0.25);
+}
+
+.vault-bulk-queue-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+
+.vault-bulk-summary-tag {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--burgundy);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vault-bulk-clear-btn {
+  background: none;
+  border: none;
+  color: #DC2626;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 2px 6px;
+}
+
+.vault-bulk-files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  max-height: 230px;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  background: #FCF9F2;
+  margin-bottom: 12px;
+}
+
+.vault-bulk-thumb-card {
+  position: relative;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: #000;
+  aspect-ratio: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.vault-bulk-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vault-bulk-thumb-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  color: #FFF;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 2;
+}
+
+.vault-bulk-thumb-remove:hover {
+  background: #DC2626;
+}
+
+.vault-bulk-thumb-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.7);
+  color: #FFF;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.vault-bulk-thumb-status {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(24, 8, 14, 0.88);
+  color: #FFF;
+  font-size: 0.66rem;
+  padding: 3px 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vault-bulk-thumb-status.success {
+  background: rgba(5, 150, 105, 0.92);
+  color: #FFF;
+}
+
+.vault-bulk-thumb-status.uploading {
+  background: rgba(212, 175, 55, 0.95);
+  color: #3D0A14;
+  font-weight: 700;
+}
+
+.vault-bulk-thumb-status.error {
+  background: rgba(220, 38, 38, 0.92);
+  color: #FFF;
+}
+
+.vault-bulk-add-more-btn {
+  border: 1.5px dashed var(--border-gold);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--cream);
+  color: var(--burgundy);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  aspect-ratio: 1;
+}
+
+.vault-bulk-add-more-btn:hover {
+  background: var(--blush-light);
+  border-color: var(--burgundy);
+}
+
+.vault-bulk-progress-box {
+  background: #FDFBF7;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.vault-progress-bar-bg {
+  height: 8px;
+  background: #E5E7EB;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.vault-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--burgundy) 0%, var(--gold) 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
 @media (max-width: 900px) {
   .vault-grid {
     grid-template-columns: repeat(2, 1fr);
